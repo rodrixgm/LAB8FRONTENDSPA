@@ -25,6 +25,9 @@ import { formatPrice, formatArea, truncateText } from '@/lib/utils';
 interface PropertyCardProps {
   property: Property;
   onDelete?: (id: string) => void;
+  isSelected?: boolean;
+  isCompareDisabled?: boolean;
+  onToggleCompare?: (property: Property) => void;
 }
 
 /**
@@ -40,7 +43,7 @@ interface PropertyCardProps {
  * @param property - Datos de la propiedad
  * @param onDelete - Callback opcional para eliminar
  */
-export function PropertyCard({ property, onDelete }: PropertyCardProps): React.ReactElement {
+export function PropertyCard({ property, onDelete, isSelected = false, isCompareDisabled = false, onToggleCompare }: PropertyCardProps): React.ReactElement {
   // Uso de Optional Chaining (?.) y Nullish Coalescing (??)
   // 1. property.images?.[0] -> Si images es null/undefined, devuelve undefined sin lanzar error
   // 2. ?? -> Si lo anterior es null/undefined, usa el placeholder
@@ -116,13 +119,23 @@ export function PropertyCard({ property, onDelete }: PropertyCardProps): React.R
         </div>
       </CardContent>
 
-      <CardFooter className="p-4 pt-0 gap-2">
-        {/* Botón ver detalles */}
+      <CardFooter className="p-4 pt-0 gap-2 flex-wrap">
+        {onToggleCompare && (
+          <Button
+            type="button"
+            variant={isSelected ? 'default' : 'outline'}
+            className="w-full"
+            disabled={isCompareDisabled && !isSelected}
+            onClick={() => onToggleCompare(property)}
+          >
+            {isSelected ? 'Quitar de comparar' : 'Comparar'}
+          </Button>
+        )}
+
         <Button asChild className="flex-1">
           <Link to={`/property/${property.id}`}>Ver detalles</Link>
         </Button>
 
-        {/* Botón eliminar (si se proporciona callback) */}
         {onDelete && (
           <Button
             variant="destructive"

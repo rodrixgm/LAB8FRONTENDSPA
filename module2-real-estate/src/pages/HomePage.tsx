@@ -46,6 +46,7 @@ export function HomePage(): React.ReactElement {
   // =========================================================================
   const [properties, setProperties] = useState<Property[]>([]);
   const [filters, setFilters] = useState<PropertyFilters>({});
+  const [compareList, setCompareList] = useState<string[]>([]);
 
   // =========================================================================
   // CARGAR PROPIEDADES
@@ -108,6 +109,21 @@ export function HomePage(): React.ReactElement {
       loadProperties();
     }
   };
+  const handleToggleCompare = (property: Property): void => {
+    setCompareList((prev) => {
+      const isAlreadySelected = prev.includes(property.id);
+
+      if (isAlreadySelected) {
+        return prev.filter((id) => id !== property.id);
+      }
+
+      if (prev.length >= 3) {
+        return prev;
+      }
+
+      return [...prev, property.id];
+    });
+  };
 
   // Verificamos si hay filtros activos
   const hasFilters = Object.values(filters).some(
@@ -125,12 +141,20 @@ export function HomePage(): React.ReactElement {
           </p>
         </div>
 
-        <Button asChild>
-          <Link to="/new">
-            <Plus className="h-4 w-4 mr-2" />
-            Nueva Propiedad
-          </Link>
-        </Button>
+        <div className="flex gap-2">
+          <Button asChild variant="outline">
+            <Link to="/compare">
+              Comparar ({compareList.length}/3)
+            </Link>
+          </Button>
+
+          <Button asChild>
+            <Link to="/new">
+              <Plus className="h-4 w-4 mr-2" />
+              Nueva Propiedad
+            </Link>
+          </Button>
+        </div>
       </div>
 
       {/* Filtros */}
@@ -243,6 +267,9 @@ export function HomePage(): React.ReactElement {
               key={property.id}
               property={property}
               onDelete={handleDelete}
+              isSelected={compareList.includes(property.id)}
+              isCompareDisabled={compareList.length >= 3}
+              onToggleCompare={handleToggleCompare}
             />
           ))}
         </div>
