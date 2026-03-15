@@ -12,12 +12,15 @@
 // =============================================================================
 
 import type React from 'react';
+import { useState } from 'react';
 import { Routes, Route, Link } from 'react-router-dom';
 import { Toaster } from '@/components/ui/sonner';
 import { Home, Building2 } from 'lucide-react';
 import { HomePage } from '@/pages/HomePage';
 import { NewPropertyPage } from '@/pages/NewPropertyPage';
 import { PropertyDetailPage } from '@/pages/PropertyDetailPage';
+import { ComparePage } from '@/pages/ComparePage';
+import type { Property } from '@/types/property';
 
 /**
  * Componente principal de la aplicación.
@@ -28,6 +31,27 @@ import { PropertyDetailPage } from '@/pages/PropertyDetailPage';
  * - Footer con créditos
  */
 function App(): React.ReactElement {
+  const [compareList, setCompareList] = useState<string[]>([]);
+
+  const handleToggleCompare = (property: Property): void => {
+    setCompareList((prev) => {
+      const isAlreadySelected = prev.includes(property.id);
+
+      if (isAlreadySelected) {
+        return prev.filter((id) => id !== property.id);
+      }
+
+      if (prev.length >= 3) {
+        return prev;
+      }
+
+      return [...prev, property.id];
+    });
+  };
+
+  const handleRemoveFromCompare = (id: string): void => {
+    setCompareList((prev) => prev.filter((propertyId) => propertyId !== id));
+  };
   return (
     <>
       {/* Toaster para notificaciones - fuera del layout para evitar problemas de z-index */}
@@ -67,14 +91,31 @@ function App(): React.ReactElement {
         <main className="flex-1">
           <Routes>
             {/* Página principal - Lista de propiedades */}
-            <Route path="/" element={<HomePage />} />
+            <Route
+              path="/"
+              element={
+                <HomePage
+                  compareList={compareList}
+                  onToggleCompare={handleToggleCompare}
+                />
+              }
+            />
 
             {/* Página para crear nueva propiedad */}
             <Route path="/new" element={<NewPropertyPage />} />
 
             {/* Página de detalle de propiedad */}
             <Route path="/property/:id" element={<PropertyDetailPage />} />
-
+            
+            {<Route
+              path="/compare"
+              element={
+                <ComparePage
+                  compareList={compareList}
+                  onRemoveFromCompare={handleRemoveFromCompare}
+                />
+              }
+            />}
             {/* Ruta 404 - Página no encontrada */}
             <Route
               path="*"

@@ -18,6 +18,7 @@ import { Button } from '@/components/ui/button';
 import type { Property } from '@/types/property';
 import { PROPERTY_TYPE_LABELS, OPERATION_TYPE_LABELS } from '@/types/property';
 import { formatPrice, formatArea, truncateText } from '@/lib/utils';
+import { CompareButton } from '@/components/CompareButton';
 
 /**
  * Props del componente PropertyCard.
@@ -121,15 +122,11 @@ export function PropertyCard({ property, onDelete, isSelected = false, isCompare
 
       <CardFooter className="p-4 pt-0 gap-2 flex-wrap">
         {onToggleCompare && (
-          <Button
-            type="button"
-            variant={isSelected ? 'default' : 'outline'}
-            className="w-full"
-            disabled={isCompareDisabled && !isSelected}
+          <CompareButton
+            isSelected={isSelected}
+            isDisabled={isCompareDisabled}
             onClick={() => onToggleCompare(property)}
-          >
-            {isSelected ? 'Quitar de comparar' : 'Comparar'}
-          </Button>
+          />
         )}
 
         <Button asChild className="flex-1">

@@ -34,10 +34,17 @@ import {
   OPERATION_TYPE_LABELS,
 } from '@/types/property';
 
+interface HomePageProps {
+  compareList: string[];
+  onToggleCompare: (property: Property) => void;
+}
 /**
  * Página principal con lista de propiedades y filtros.
  */
-export function HomePage(): React.ReactElement {
+export function HomePage({
+  compareList,
+  onToggleCompare,
+}: HomePageProps): React.ReactElement {
   // =========================================================================
   // ESTADO
   // =========================================================================
@@ -46,7 +53,6 @@ export function HomePage(): React.ReactElement {
   // =========================================================================
   const [properties, setProperties] = useState<Property[]>([]);
   const [filters, setFilters] = useState<PropertyFilters>({});
-  const [compareList, setCompareList] = useState<string[]>([]);
 
   // =========================================================================
   // CARGAR PROPIEDADES
@@ -109,21 +115,7 @@ export function HomePage(): React.ReactElement {
       loadProperties();
     }
   };
-  const handleToggleCompare = (property: Property): void => {
-    setCompareList((prev) => {
-      const isAlreadySelected = prev.includes(property.id);
-
-      if (isAlreadySelected) {
-        return prev.filter((id) => id !== property.id);
-      }
-
-      if (prev.length >= 3) {
-        return prev;
-      }
-
-      return [...prev, property.id];
-    });
-  };
+  
 
   // Verificamos si hay filtros activos
   const hasFilters = Object.values(filters).some(
@@ -269,7 +261,7 @@ export function HomePage(): React.ReactElement {
               onDelete={handleDelete}
               isSelected={compareList.includes(property.id)}
               isCompareDisabled={compareList.length >= 3}
-              onToggleCompare={handleToggleCompare}
+              onToggleCompare={onToggleCompare}
             />
           ))}
         </div>
