@@ -95,3 +95,30 @@ Renderizado condicional
 Construcción dinámica de interfaces
 
 Diseño de funcionalidades interactivas para el usuario
+
+
+## Image Gallery (Part 2)
+
+Se implementó una galería de imágenes para visualizar múltiples imágenes por propiedad.
+
+### Funcionalidades principales
+
+- Visualización de imágenes en una cuadrícula de miniaturas
+- Modal de pantalla completa al hacer clic en una imagen
+- Navegación entre imágenes:
+  - Botones (izquierda / derecha)
+  - Teclado (← → y Escape)
+- Contador de imágenes (ej: "3 of 10")
+- Cierre del modal mediante:
+  - Botón (X)
+  - Tecla Escape
+  - Click en el fondo (backdrop)
+
+### Componentes creados
+
+- `ImageGallery.tsx`: Maneja la visualización de miniaturas y estado del modal
+- `ImageModal.tsx`: Maneja la vista en pantalla completa y navegación
+
+### Integración
+
+La galería fue integrada en `PropertyDetailPage.tsx`, reemplazando la visualización anterior de imágenes por una experiencia interactiva más completa.
