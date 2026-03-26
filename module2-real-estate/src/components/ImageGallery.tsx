@@ -1,105 +1,105 @@
 import type React from 'react';
-import { useEffect } from 'react';
-import { ChevronLeft, ChevronRight, X } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { useState } from 'react';
+import { ImageModal } from './ImageModal';
 
-interface ImageModalProps {
+interface ImageGalleryProps {
   images: string[];
-  currentIndex: number;
-  isOpen: boolean;
   title: string;
-  onClose: () => void;
-  onPrev: () => void;
-  onNext: () => void;
+  operationTypeLabel?: string;
+  operationBadgeClassName?: string;
 }
 
-export function ImageModal({
+export function ImageGallery({
   images,
-  currentIndex,
-  isOpen,
   title,
-  onClose,
-  onPrev,
-  onNext,
-}: ImageModalProps): React.ReactElement | null {
-  useEffect(() => {
-    if (!isOpen) return;
+  operationTypeLabel,
+  operationBadgeClassName,
+}: ImageGalleryProps): React.ReactElement {
+  const [selectedIndex, setSelectedIndex] = useState<number>(0);
+  const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
 
-    const handleKeyDown = (event: KeyboardEvent): void => {
-      if (event.key === 'Escape') onClose();
-      if (event.key === 'ArrowLeft') onPrev();
-      if (event.key === 'ArrowRight') onNext();
-    };
+  const safeImages =
+    images.length > 0
+      ? images
+      : [
+          `https://placehold.co/1200x600/e2e8f0/64748b?text=${encodeURIComponent(
+            title
+          )}`,
+        ];
 
-    window.addEventListener('keydown', handleKeyDown);
+  const openModal = (index: number): void => {
+    setSelectedIndex(index);
+    setIsModalOpen(true);
+  };
 
-    return () => {
-      window.removeEventListener('keydown', handleKeyDown);
-    };
-  }, [isOpen, onClose, onPrev, onNext]);
+  const closeModal = (): void => {
+    setIsModalOpen(false);
+  };
 
-  if (!isOpen || images.length === 0) return null;
+  const goToPrev = (): void => {
+    setSelectedIndex((prev) =>
+      prev === 0 ? safeImages.length - 1 : prev - 1
+    );
+  };
 
-  const currentImage = images[currentIndex];
-
-  const handleBackdropClick = (
-    event: React.MouseEvent<HTMLDivElement>
-  ): void => {
-    if (event.target === event.currentTarget) {
-      onClose();
-    }
+  const goToNext = (): void => {
+    setSelectedIndex((prev) =>
+      prev === safeImages.length - 1 ? 0 : prev + 1
+    );
   };
 
   return (
-    <div
-      className="fixed inset-0 z-50 bg-black/90 flex items-center justify-center p-4"
-      onClick={handleBackdropClick}
-    >
-      <Button
-        variant="ghost"
-        size="icon"
-        className="absolute top-4 right-4 text-white hover:bg-white/20"
-        onClick={onClose}
-        aria-label="Cerrar modal"
-      >
-        <X className="h-6 w-6" />
-      </Button>
+    <>
+      <div className="space-y-3">
+        <div className="relative rounded-lg overflow-hidden">
+          <button
+            type="button"
+            className="w-full"
+            onClick={() => openModal(0)}
+          >
+            <img
+              src={safeImages[0]}
+              alt={`${title} - Imagen principal`}
+              className="w-full h-[400px] object-cover cursor-pointer"
+            />
+          </button>
 
-      {images.length > 1 && (
-        <Button
-          variant="ghost"
-          size="icon"
-          className="absolute left-4 top-1/2 -translate-y-1/2 text-white hover:bg-white/20"
-          onClick={onPrev}
-          aria-label="Imagen anterior"
-        >
-          <ChevronLeft className="h-8 w-8" />
-        </Button>
-      )}
+          {operationTypeLabel && operationBadgeClassName && (
+            <span
+              className={`absolute top-4 left-4 px-4 py-2 text-sm font-semibold rounded-full ${operationBadgeClassName}`}
+            >
+              {operationTypeLabel}
+            </span>
+          )}
+        </div>
 
-      <div className="max-w-6xl w-full flex flex-col items-center">
-        <img
-          src={currentImage}
-          alt={`${title} - Imagen ${currentIndex + 1}`}
-          className="max-h-[85vh] max-w-full object-contain rounded-lg"
-        />
-
-        <div className="mt-4 text-white text-sm md:text-base">
-          {currentIndex + 1} of {images.length}
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2">
+          {safeImages.map((image, index) => (
+            <button
+              key={`${image}-${index}`}
+              type="button"
+              onClick={() => openModal(index)}
+              className="rounded-lg overflow-hidden focus:outline-none focus:ring-2 focus:ring-primary"
+            >
+              <img
+                src={image}
+                alt={`${title} - Imagen ${index + 1}`}
+                className="w-full h-24 object-cover cursor-pointer hover:opacity-90 transition"
+              />
+            </button>
+          ))}
         </div>
       </div>
 
-      {images.length > 1 && (
-        <Button
-          variant="ghost"
-          size="icon"
-          className="absolute right-4 top-1/2 -translate-y-1/2 text-white hover:bg-white/20"
-          onClick={onNext}
-          aria-label="Imagen siguiente"
-        >
-          <ChevronRight className="h-8 w-8" />
-        </Button>
-      )}
-    </div>
+      <ImageModal
+        images={safeImages}
+        currentIndex={selectedIndex}
+        isOpen={isModalOpen}
+        title={title}
+        onClose={closeModal}
+        onPrev={goToPrev}
+        onNext={goToNext}
+      />
+    </>
   );
 }

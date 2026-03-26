@@ -14,6 +14,7 @@ import { ArrowLeft, MapPin, Bed, Bath, Square, Calendar, Tag } from 'lucide-reac
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { getPropertyById, deleteProperty } from '@/lib/storage';
+import { ImageGallery } from '@/components/ImageGallery';
 import {
   PROPERTY_TYPE_LABELS,
   OPERATION_TYPE_LABELS,
@@ -58,9 +59,7 @@ export function PropertyDetailPage(): React.ReactElement {
   };
 
   // Imagen principal o placeholder
-  const mainImage =
-    property.images[0] ??
-    `https://placehold.co/1200x600/e2e8f0/64748b?text=${encodeURIComponent(property.propertyType)}`;
+
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -78,22 +77,16 @@ export function PropertyDetailPage(): React.ReactElement {
         {/* Columna principal */}
         <div className="lg:col-span-2 space-y-6">
           {/* Imagen principal */}
-          <div className="relative rounded-lg overflow-hidden">
-            <img
-              src={mainImage}
-              alt={property.title}
-              className="w-full h-[400px] object-cover"
-            />
-            <span
-              className={`absolute top-4 left-4 px-4 py-2 text-sm font-semibold rounded-full ${
-                property.operationType === 'venta'
-                  ? 'bg-green-500 text-white'
-                  : 'bg-blue-500 text-white'
-              }`}
-            >
-              {OPERATION_TYPE_LABELS[property.operationType]}
-            </span>
-          </div>
+           <ImageGallery
+            images={property.images}
+            title={property.title}
+            operationTypeLabel={OPERATION_TYPE_LABELS[property.operationType]}
+            operationBadgeClassName={
+              property.operationType === 'venta'
+                ? 'bg-green-500 text-white'
+                : 'bg-blue-500 text-white'
+            }
+          />
 
           {/* Galería de imágenes adicionales */}
           {property.images.length > 1 && (
